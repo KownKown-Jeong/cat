@@ -9,5 +9,7 @@ export interface IMission {
     examples: string[];
     conclusion?: string;
     createdBy: mongoose.Types.ObjectId;
-    assignedTo?: string[];
+    assignedTo?: mongoose.Types.ObjectId[];
+    status: 'pending' | 'in-progress' | 'completed';
+    dueDate?: Date;
 }

@@ -23,7 +23,16 @@ const missionSchema = new mongoose.Schema<IMission>({
     ref: 'User',
     required: true
   },
-  assignedTo: [String]  // team names
+  assignedTo: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User'
+  }],
+  status: {
+    type: String,
+    enum: ['pending', 'in-progress', 'completed'],
+    default: 'pending'
+  },
+  dueDate: Date
 }, {
   timestamps: true
 });
