@@ -19,7 +19,7 @@ export default function CreateMission() {
     introduction: '',
     mainContent: '',
     examples: [''],
-    conclusion: ''
+    conclusion: '',
   })
 
   const handleExampleChange = (index: number, value: string) => {
@@ -29,9 +29,9 @@ export default function CreateMission() {
   }
 
   const addExample = () => {
-    setFormData({ 
-      ...formData, 
-      examples: [...formData.examples, ''] 
+    setFormData({
+      ...formData,
+      examples: [...formData.examples, ''],
     })
   }
 
@@ -43,27 +43,39 @@ export default function CreateMission() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     try {
-      // TODO: API 연동
-      const response = await fetch('/api/admin/missions', {
+      const token = localStorage.getItem('token')
+      const response = await fetch('http://localhost:4000/api/missions', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData)
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(formData),
       })
 
-      if (response.ok) {
-        navigate('/admin/missions')
+      if (!response.ok) {
+        throw new Error('미션 생성에 실패했습니다')
       }
+
+      const data = await response.json()
+      console.log('미션이 성공적으로 생성되었습니다:', data)
+      navigate('/admin/missions')
     } catch (error) {
-      console.error('Failed to create mission:', error)
+      console.error('미션 생성 중 오류 발생:', error)
     }
   }
 
   return (
     <div className="min-h-screen bg-gray-50 p-8">
       <div className="max-w-3xl mx-auto">
-        <h1 className="text-3xl font-bold text-gray-900 mb-8">Create New Mission</h1>
-        
-        <form onSubmit={handleSubmit} className="space-y-6 bg-white p-6 rounded-lg shadow">
+        <h1 className="text-3xl font-bold text-gray-900 mb-8">
+          Create New Mission
+        </h1>
+
+        <form
+          onSubmit={handleSubmit}
+          className="space-y-6 bg-white p-6 rounded-lg shadow"
+        >
           {/* 제목 및 공개 설정 */}
           <div className="flex gap-4 items-start">
             <div className="flex-1">
@@ -75,7 +87,9 @@ export default function CreateMission() {
                 required
                 className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
                 value={formData.title}
-                onChange={e => setFormData({ ...formData, title: e.target.value })}
+                onChange={(e) =>
+                  setFormData({ ...formData, title: e.target.value })
+                }
               />
             </div>
             <div className="w-32">
@@ -85,7 +99,12 @@ export default function CreateMission() {
               <select
                 className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
                 value={formData.isPublic ? 'public' : 'private'}
-                onChange={e => setFormData({ ...formData, isPublic: e.target.value === 'public' })}
+                onChange={(e) =>
+                  setFormData({
+                    ...formData,
+                    isPublic: e.target.value === 'public',
+                  })
+                }
               >
                 <option value="public">Public</option>
                 <option value="private">Private</option>
@@ -101,7 +120,9 @@ export default function CreateMission() {
             <textarea
               className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 h-24"
               value={formData.introduction}
-              onChange={e => setFormData({ ...formData, introduction: e.target.value })}
+              onChange={(e) =>
+                setFormData({ ...formData, introduction: e.target.value })
+              }
               placeholder="Enter greeting or introduction message..."
             />
           </div>
@@ -115,7 +136,9 @@ export default function CreateMission() {
               required
               className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 h-32"
               value={formData.mainContent}
-              onChange={e => setFormData({ ...formData, mainContent: e.target.value })}
+              onChange={(e) =>
+                setFormData({ ...formData, mainContent: e.target.value })
+              }
               placeholder="Enter main mission content..."
             />
           </div>
@@ -139,7 +162,7 @@ export default function CreateMission() {
                 <textarea
                   className="flex-1 px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
                   value={example}
-                  onChange={e => handleExampleChange(index, e.target.value)}
+                  onChange={(e) => handleExampleChange(index, e.target.value)}
                   placeholder={`Example ${index + 1}`}
                 />
                 {formData.examples.length > 1 && (
@@ -163,7 +186,9 @@ export default function CreateMission() {
             <textarea
               className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 h-24"
               value={formData.conclusion}
-              onChange={e => setFormData({ ...formData, conclusion: e.target.value })}
+              onChange={(e) =>
+                setFormData({ ...formData, conclusion: e.target.value })
+              }
               placeholder="Enter concluding message..."
             />
           </div>
