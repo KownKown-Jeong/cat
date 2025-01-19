@@ -10,8 +10,13 @@ dotenv.config();
 
 const app = express();
 
+
 // 미들웨어
-app.use(cors());
+// CORS 설정
+app.use(cors({
+  origin: 'http://localhost:5173', // 프론트엔드 주소
+  credentials: true
+}));
 app.use(express.json());
 
 // MongoDB 연결

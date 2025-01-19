@@ -33,7 +33,8 @@ export const createOrUpdateChat = async (req: Request, res: Response) => {
     // 사용자 메시지 추가
     chatSession.messages.push({
       content: message,
-      role: 'user'
+      role: 'user',
+      timestamp: new Date()
     });
 
     // 미션 정보 가져오기 (있는 경우)
@@ -47,8 +48,8 @@ export const createOrUpdateChat = async (req: Request, res: Response) => {
 
     // Anthropic API 호출
     const completion = await anthropic.messages.create({
-      model: "claude-3-opus-20240229",
-      max_tokens: 1024,
+      model: "claude-3-haiku-20240307",
+      max_tokens: 1000,
       messages: [
         {
           role: "user",
@@ -64,7 +65,8 @@ export const createOrUpdateChat = async (req: Request, res: Response) => {
       
     chatSession.messages.push({
       content: aiResponse,
-      role: 'assistant'
+      role: 'assistant',
+      timestamp: new Date()
     });
 
     // 채팅 저장

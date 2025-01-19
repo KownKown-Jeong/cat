@@ -1,4 +1,4 @@
-// src/routes/chatRoutes.ts
+// src/routes/chat.routes.ts
 import express, { RequestHandler } from 'express';
 import { createOrUpdateChat, getChatHistory, summarizeChat } from '../controllers/chat.controller';
 import { authenticateTeamMember } from '../middlewares/auth';

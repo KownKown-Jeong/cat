@@ -2,9 +2,19 @@
 import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
 
+interface DecodedToken {
+  userId: string;
+  teamName?: string;
+  isAdmin?: boolean;
+}
+
 export interface AuthRequest extends Request {
   userId?: string;
   isAdmin?: boolean;
+  user?: {
+    userId: string;
+    teamName: string;
+  };
 }
 
 export const auth = async (req: AuthRequest, res: Response, next: NextFunction) => {
@@ -15,13 +25,22 @@ export const auth = async (req: AuthRequest, res: Response, next: NextFunction) 
       throw new Error('Authentication required');
     }
 
-    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'secret') as any;
+    const JWT_SECRET = process.env.JWT_SECRET || 'secret';
+    const decoded = jwt.verify(token, JWT_SECRET) as DecodedToken;
+    
     req.userId = decoded.userId;
     req.isAdmin = decoded.isAdmin;
     
+    if (decoded.teamName) {
+      req.user = {
+        userId: decoded.userId,
+        teamName: decoded.teamName
+      };
+    }
+    
     next();
   } catch (error) {
-    res.status(401).json({ error: 'Please authenticate' });
+    res.status(401).json({ error: '인증이 필요합니다.' });
   }
 };
 
@@ -33,5 +52,19 @@ export const adminOnly = async (req: AuthRequest, res: Response, next: NextFunct
     next();
   } catch (error) {
     res.status(403).json({ error: 'Admin access required' });
+  }
+};
+
+export const authenticateTeamMember = async (req: AuthRequest, res: Response, next: NextFunction) => {
+  try {
+    const requestedTeamName = req.params.teamName;
+    
+    if (!req.user || req.user.teamName !== requestedTeamName) {
+      throw new Error('팀 접근 권한이 없습니다.');
+    }
+    
+    next();
+  } catch (error) {
+    res.status(403).json({ error: '해당 팀에 접근 권한이 없습니다.' });
   }
 };
